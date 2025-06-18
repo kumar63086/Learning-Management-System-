@@ -23,7 +23,7 @@ const corsOptions = {
 };
 
 // Apply raw middleware ONLY to Clerk webhook before anything else
-app.use('/api/webhooks/clerk', express.raw({ type: 'application/json' }));
+app.use('/webhook/clerk', express.raw({ type: 'application/json' }));
 
 // Use Helmet and CORS
 app.use(helmet());
@@ -33,10 +33,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Register webhook routes
 app.use('/api/webhooks', webhookRoutes);
-
 // Health check
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Healthy', status: 'OK' });
