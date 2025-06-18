@@ -11,7 +11,12 @@ const app= express();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors(
+    {
+        origin: process.env.CORS_ORIGIN,
+        credentials: true
+    }
+));
 //routes
 app.use("/",(req,res)=>{
     res.send("Welcome to the API");
