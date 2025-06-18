@@ -1,11 +1,11 @@
 
 ```
-###🧠 Problem Solving in Projects – Real Scenarios
+# 🧠 Problem Solving in Projects – Real Scenarios
 🧩 1. Dynamic Role-Based Access (Student vs Instructor)
 🛑 Problem:
 Clerk provided basic auth, but I needed different dashboards and permissions for students and instructors.
 
-##✅ Solution:
+#✅ Solution:
 
 Used Clerk metadata to store user roles.
 
