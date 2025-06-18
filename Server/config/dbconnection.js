@@ -1,17 +1,24 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
-const MONGO_URI=process.env.MONGO_URI 
-// Set strictQuery to suppress Mongoose 7 warning
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const MONGO_URI = process.env.MONGO_URI;
+
+// Optional: silence Mongoose strictQuery warning (from Mongoose 7)
 mongoose.set('strictQuery', true);
-const connectDb=async ()=>{
+
+const connectDb = async () => {
   try {
-    await mongoose.connect(MONGO_URI).then((data)=>{
-        console.log(`DATABASE CONNECTED WITH ${data.connections[0].name}`);
+    const connection = await mongoose.connect(`${MONGO_URI}/LMS`, {
+      
     });
+
+    console.log(`DATABASE CONNECTED Successfully: ${connection.connection.name}`);
   } catch (error) {
-    console.log(error.Message);
-    setTimeout(connectDb,5000);
+    console.error(` DATABASE CONNECTION ERROR: ${error.message}`);
+    setTimeout(connectDb, 5000); // retry after 5 seconds
   }
-  
-}
-module.exports = connectDb;
+};
+
+export default connectDb;

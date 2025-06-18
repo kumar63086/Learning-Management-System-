@@ -1,12 +1,7 @@
-const { Webhook } = require('svix');
-const { StatusCodes } = require('http-status-codes');
-const User = require('../model/User');
-const successResponse = require('../utils/common/success-response');
-const errorResponse = require('../utils/common/error-response');
-const catchAsync = require('../utils/catchAsync/catchAsync');
+import { Webhook } from 'svix';
+import User from '../model/User.js';
 
-// Webhook handler for Clerk events
-const clerkWebhooks = catchAsync(async (req, res) => {
+export const clerkWebhooks = async (req, res) => {
   try {
     const wbhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
@@ -17,7 +12,7 @@ const clerkWebhooks = catchAsync(async (req, res) => {
     });
 
     const { data, type } = req.body;
-    console.log(`✅ Clerk webhook received: ${type}`);
+    console.log(` Clerk webhook received: ${type}`);
 
     switch (type) {
       case 'user.created': {
@@ -29,13 +24,10 @@ const clerkWebhooks = catchAsync(async (req, res) => {
         };
 
         await User.create(userData);
-
-        return res.status(StatusCodes.CREATED).json(
-          successResponse({
-            message: 'User created successfully',
-            data: userData,
-          })
-        );
+        return res.status(201).json({
+          message: 'User created successfully',
+          data: userData,
+        });
       }
 
       case 'user.updated': {
@@ -46,40 +38,24 @@ const clerkWebhooks = catchAsync(async (req, res) => {
         };
 
         await User.findByIdAndUpdate(data.id, userData);
-        return res.status(StatusCodes.OK).json(
-          successResponse({
-            message: 'User updated successfully',
-            data: userData,
-          })
-        );
+        return res.status(200).json({
+          message: 'User updated successfully',
+          data: userData,
+        });
       }
 
       case 'user.deleted': {
         await User.findByIdAndDelete(data.id);
-        return res.status(StatusCodes.OK).json(
-          successResponse({
-            message: 'User deleted successfully',
-          })
-        );
+        return res.status(200).json({
+          message: 'User deleted successfully',
+        });
       }
 
       default:
-        console.warn("⚠️ Unhandled Clerk webhook event type:", type);
-        return res.status(StatusCodes.BAD_REQUEST).json(
-          errorResponse({
-            message: `Unhandled event type: ${type}`,
-          })
-        );
+        return res.status(400).json({ message: 'Unhandled event type' });
     }
   } catch (error) {
-    console.error("❌ Clerk webhook error:", error.message);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
-      errorResponse({
-        message: 'Error processing webhook',
-        error: error.message,
-      })
-    );
+    console.error('Error handling Clerk webhook:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-});
-
-module.exports = { clerkWebhooks }  ;
+}
