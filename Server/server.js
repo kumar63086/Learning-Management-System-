@@ -21,7 +21,7 @@ app.use(cors(
 app.use("/",(req,res)=>{
     res.send("Welcome to the API");
 })
-app.post("/clerk",bodyParser.raw({ type: 'application/json' }),clerkWebhooks)
+app.post("/clerk",express.json(),clerkWebhooks)
 app.listen(Port,async()=>{
     console.log(`Server is running on port ${Port}`);
    await connectDb();

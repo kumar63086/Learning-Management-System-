@@ -4,19 +4,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 export const clerkWebhooks = async (req, res) => {
   try {
-     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-
-    // ✅ Use raw Buffer (req.body) for svix verification
-    const payload = req.body;
-    const headers = {
+    const wbhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    const payload = req.body; 
+    await wbhook.verify(JSON.stringify(req.body), {
       'svix-id': req.headers['svix-id'],
       'svix-timestamp': req.headers['svix-timestamp'],
       'svix-signature': req.headers['svix-signature'],
-    };
+    });
 
-    // ✅ Verified and parsed event
-    const evt = wh.verify(payload, headers);
-    const { data, type } = evt;
+    const { data, type } = req.body;
+    console.log(` Clerk webhook received: ${type}`);
 
     switch (type) {
       case 'user.created': {
@@ -47,7 +44,7 @@ export const clerkWebhooks = async (req, res) => {
           message: 'User updated successfully',
           data: userData,
         });
-
+        break
       }
 
       case 'user.deleted': {
@@ -55,7 +52,7 @@ export const clerkWebhooks = async (req, res) => {
         return res.status(200).json({
           message: 'User deleted successfully',
         });
-    
+        break
       }
 
       default:
